@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { plural } from "@/lib/format";
 import type { Part } from "@/lib/calc";
 import type { WireCut } from "@/lib/wires";
 import { PartsTable } from "./PartsTable";
@@ -49,11 +50,7 @@ export function ProductCalculator({ parts, wires, materials }: Props) {
 }
 
 export function pluralDevices(n: number): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return "виріб";
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "вироби";
-  return "виробів";
+  return plural(n, ["виріб", "вироби", "виробів"]);
 }
 
 export function Stat({ label, value, note }: { label: string; value: string; note?: string }) {

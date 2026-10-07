@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { pluralDevices, Stat } from "./ProductCalculator";
 import { calcMaterials, type MaterialItem, type MaterialTotal } from "@/lib/bom";
-import { formatCount, formatLength } from "@/lib/format";
+import { formatCount, formatLength, plural } from "@/lib/format";
 
 /** Три раздела: комплектующие, крепёж (одинаковые позиции сложены), нарезка лент на отрезки */
 export function MaterialsSections({ items, devices }: { items: MaterialItem[]; devices: number }) {
@@ -27,14 +27,14 @@ export function MaterialsSections({ items, devices }: { items: MaterialItem[]; d
       )}
 
       {cuts.length > 0 && (
-        <Section title="Нарізання стрічок">
+        <Section title="Нарізання на відрізки">
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             {cutTotals.map((t) => (
               <Stat
-                key={t.name}
-                label={t.name}
+                key={t.code ?? t.name}
+                label={t.code ? `${t.name} · ${t.code}` : t.name}
                 value={formatLength(t.totalCm ?? 0)}
-                note={`${formatCount(t.pieces)} відрізків`}
+                note={`${formatCount(t.pieces)} ${plural(t.pieces, ["відрізок", "відрізки", "відрізків"])}`}
               />
             ))}
           </div>
@@ -51,7 +51,9 @@ export function MaterialsSections({ items, devices }: { items: MaterialItem[]; d
               <tbody>
                 {cuts.map((r, i) => (
                   <tr key={i} className="border-b border-neutral-100 align-top">
-                    <td className="py-3 pr-3">{r.name}</td>
+                    <td className="py-3 pr-3">
+                      <Name name={r.name} code={r.code} />
+                    </td>
                     <td className="py-3 pr-3 text-right">{formatLength(r.lengthCm ?? 0)}</td>
                     <td className="py-3 pr-3 text-right">{formatCount(r.count)} шт</td>
                     <td className="py-3 text-right">
@@ -91,8 +93,10 @@ function PiecesTable({ rows, forDevices, withTotal }: { rows: MaterialTotal[]; f
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.name} className="border-b border-neutral-100">
-              <td className="py-3 pr-3">{r.name}</td>
+            <tr key={r.code ?? r.name} className="border-b border-neutral-100">
+              <td className="py-3 pr-3">
+                <Name name={r.name} code={r.code} />
+              </td>
               <td className="py-3 pr-3 text-right">{formatCount(r.count)} шт</td>
               <td className="py-3 text-right">{formatCount(r.pieces)} шт</td>
             </tr>
@@ -109,5 +113,14 @@ function PiecesTable({ rows, forDevices, withTotal }: { rows: MaterialTotal[]; f
         )}
       </table>
     </div>
+  );
+}
+
+function Name({ name, code }: { name: string; code?: string }) {
+  return (
+    <>
+      {name}
+      {code && <span className="ml-2 text-xs text-neutral-400">{code}</span>}
+    </>
   );
 }
