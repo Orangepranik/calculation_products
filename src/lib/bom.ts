@@ -1,11 +1,11 @@
-export type MaterialCategory = "component" | "fastener" | "cut";
+export type MaterialCategory = "component" | "fastener" | "cut" | "packaging";
 
 export type MaterialItem = {
   /** Название для сайта */
   name: string;
   /** Внутренний код в системе фирмы, если отличается от названия (PRODUCT22 → "Термоусадка") */
   code?: string;
-  /** component — комплектующие, fastener — крепёж, cut — нарезка лент/скотча */
+  /** component — комплектующие, fastener — крепёж, cut — нарезка на отрезки, packaging — упаковка и документы */
   category: MaterialCategory;
   /** Штук (или отрезков) на одно изделие */
   count: number;

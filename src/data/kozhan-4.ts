@@ -74,4 +74,9 @@ export const kozhan4Materials: MaterialItem[] = [
   { name: "PRODUCT31", category: "component", count: 1 },
   { name: "Гвинт кріплення більший", category: "fastener", count: 7 },
   { name: "Шлейка велкро", category: "fastener", count: 2 },
+  { name: "Настанова з експлуатації", category: "packaging", count: 1 },
+  { name: "Наклейка на коробку", category: "packaging", count: 2 },
+  { name: "Коробка", category: "packaging", count: 1 },
+  { name: "Пупирчаста плівка", category: "packaging", count: 3, lengthCm: 20 },
+  { name: "Візитка", category: "packaging", count: 1 },
 ];

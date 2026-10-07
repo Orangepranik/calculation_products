@@ -71,6 +71,17 @@ export function MaterialsSections({ items, devices }: { items: MaterialItem[]; d
   );
 }
 
+/** Упаковка и документы — выводится в конце страницы */
+export function PackagingSection({ items, devices }: { items: MaterialItem[]; devices: number }) {
+  const packaging = calcMaterials(items, devices).totals.filter((t) => t.category === "packaging");
+  if (packaging.length === 0) return null;
+  return (
+    <Section title="Пакування">
+      <PiecesTable rows={packaging} forDevices={`На ${formatCount(devices)} ${pluralDevices(devices)}`} />
+    </Section>
+  );
+}
+
 function Section({ title, first, children }: { title: string; first?: boolean; children: ReactNode }) {
   return (
     <section className={first ? "mt-12" : "mt-16"}>
@@ -97,8 +108,14 @@ function PiecesTable({ rows, forDevices, withTotal }: { rows: MaterialTotal[]; f
               <td className="py-3 pr-3">
                 <Name name={r.name} code={r.code} />
               </td>
-              <td className="py-3 pr-3 text-right">{formatCount(r.count)} шт</td>
-              <td className="py-3 text-right">{formatCount(r.pieces)} шт</td>
+              <td className="py-3 pr-3 text-right">
+                {formatCount(r.count)} шт
+                {r.cm !== null && <span className="block text-xs text-neutral-400">{formatLength(r.cm)}</span>}
+              </td>
+              <td className="py-3 text-right">
+                {formatCount(r.pieces)} шт
+                {r.totalCm !== null && <span className="block text-xs text-neutral-400">{formatLength(r.totalCm)}</span>}
+              </td>
             </tr>
           ))}
         </tbody>

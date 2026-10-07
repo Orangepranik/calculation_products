@@ -6,7 +6,7 @@ import type { Part } from "@/lib/calc";
 import type { WireCut } from "@/lib/wires";
 import { PartsTable } from "./PartsTable";
 import { WiresTable } from "./WiresTable";
-import { MaterialsSections } from "./MaterialsSections";
+import { MaterialsSections, PackagingSection } from "./MaterialsSections";
 import type { MaterialItem } from "@/lib/bom";
 
 type Props = { parts?: Part[]; wires?: WireCut[]; materials?: MaterialItem[] };
@@ -45,6 +45,7 @@ export function ProductCalculator({ parts, wires, materials }: Props) {
           <WiresTable cuts={wires} devices={devices} />
         </section>
       )}
+      {materials && <PackagingSection items={materials} devices={devices} />}
     </>
   );
 }
