@@ -37,3 +37,8 @@ export function plural(n: number, [one, few, many]: [string, string, string]): s
   if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
   return many;
 }
+
+/** [{2, 6.5}, {2, 2.5}] × 10 → "20 × 6,5 см + 20 × 2,5 см" */
+export function formatSegments(segments: { count: number; lengthCm: number }[], multiplier = 1): string {
+  return segments.map((s) => `${int.format(s.count * multiplier)} × ${formatLength(s.lengthCm)}`).join(" + ");
+}

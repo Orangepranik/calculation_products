@@ -1,70 +1,34 @@
 import type { ReactNode } from "react";
-import { pluralDevices, Stat } from "./ProductCalculator";
-import { calcMaterials, type MaterialItem, type MaterialTotal } from "@/lib/bom";
-import { formatCount, formatLength, plural } from "@/lib/format";
+import { pluralDevices } from "./ProductCalculator";
+import { calcMaterials, type MaterialCategory, type MaterialItem, type MaterialTotal } from "@/lib/bom";
+import { formatCount, formatLength, formatSegments } from "@/lib/format";
 
-/** Три раздела: комплектующие, крепёж (одинаковые позиции сложены), нарезка лент на отрезки */
+const forDevicesLabel = (devices: number) => `На ${formatCount(devices)} ${pluralDevices(devices)}`;
+
+/** Комплектующие, крепёж (одинаковые позиции сложены), нарезка на отрезки */
 export function MaterialsSections({ items, devices }: { items: MaterialItem[]; devices: number }) {
-  const { rows, totals } = calcMaterials(items, devices);
-  const components = totals.filter((t) => t.category === "component");
-  const fasteners = totals.filter((t) => t.category === "fastener");
-  const cutTotals = totals.filter((t) => t.category === "cut");
-  const cuts = rows.filter((r) => r.category === "cut");
-  const forDevices = `На ${formatCount(devices)} ${pluralDevices(devices)}`;
+  const { totals } = calcMaterials(items, devices);
+  const by = (c: MaterialCategory) => totals.filter((t) => t.category === c);
+  const components = by("component");
+  const fasteners = by("fastener");
+  const cuts = by("cut");
+  const forDevices = forDevicesLabel(devices);
 
   return (
     <>
       {components.length > 0 && (
         <Section title="Комплектуючі" first>
-          <PiecesTable rows={components} forDevices={forDevices} withTotal />
+          <MaterialsTable rows={components} devices={devices} forDevices={forDevices} withTotal />
         </Section>
       )}
-
       {fasteners.length > 0 && (
         <Section title="Кріплення">
-          <PiecesTable rows={fasteners} forDevices={forDevices} />
+          <MaterialsTable rows={fasteners} devices={devices} forDevices={forDevices} />
         </Section>
       )}
-
       {cuts.length > 0 && (
         <Section title="Нарізання на відрізки">
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            {cutTotals.map((t) => (
-              <Stat
-                key={t.code ?? t.name}
-                label={t.code ? `${t.name} · ${t.code}` : t.name}
-                value={formatLength(t.totalCm ?? 0)}
-                note={`${formatCount(t.pieces)} ${plural(t.pieces, ["відрізок", "відрізки", "відрізків"])}`}
-              />
-            ))}
-          </div>
-          <div className="mt-8 overflow-x-auto">
-            <table className="w-full min-w-[560px] text-sm tabular-nums">
-              <thead>
-                <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
-                  <th className="py-2 pr-3 font-normal">Матеріал</th>
-                  <th className="py-2 pr-3 text-right font-normal">Відрізок</th>
-                  <th className="py-2 pr-3 text-right font-normal">На виріб</th>
-                  <th className="py-2 text-right font-normal">{forDevices}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cuts.map((r, i) => (
-                  <tr key={i} className="border-b border-neutral-100 align-top">
-                    <td className="py-3 pr-3">
-                      <Name name={r.name} code={r.code} />
-                    </td>
-                    <td className="py-3 pr-3 text-right">{formatLength(r.lengthCm ?? 0)}</td>
-                    <td className="py-3 pr-3 text-right">{formatCount(r.count)} шт</td>
-                    <td className="py-3 text-right">
-                      {formatCount(r.pieces)} шт
-                      <span className="block text-xs text-neutral-400">{formatLength(r.totalCm ?? 0)}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <MaterialsTable rows={cuts} devices={devices} forDevices={forDevices} />
         </Section>
       )}
     </>
@@ -77,7 +41,7 @@ export function PackagingSection({ items, devices }: { items: MaterialItem[]; de
   if (packaging.length === 0) return null;
   return (
     <Section title="Пакування">
-      <PiecesTable rows={packaging} forDevices={`На ${formatCount(devices)} ${pluralDevices(devices)}`} />
+      <MaterialsTable rows={packaging} devices={devices} forDevices={forDevicesLabel(devices)} />
     </Section>
   );
 }
@@ -91,10 +55,20 @@ function Section({ title, first, children }: { title: string; first?: boolean; c
   );
 }
 
-function PiecesTable({ rows, forDevices, withTotal }: { rows: MaterialTotal[]; forDevices: string; withTotal?: boolean }) {
+function MaterialsTable({
+  rows,
+  devices,
+  forDevices,
+  withTotal,
+}: {
+  rows: MaterialTotal[];
+  devices: number;
+  forDevices: string;
+  withTotal?: boolean;
+}) {
   return (
     <div className="mt-4 overflow-x-auto">
-      <table className="w-full min-w-[400px] text-sm tabular-nums">
+      <table className="w-full min-w-[480px] text-sm tabular-nums">
         <thead>
           <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
             <th className="py-2 pr-3 font-normal">Позиція</th>
@@ -109,12 +83,10 @@ function PiecesTable({ rows, forDevices, withTotal }: { rows: MaterialTotal[]; f
                 <Name name={r.name} code={r.code} />
               </td>
               <td className="py-3 pr-3 text-right">
-                {formatCount(r.count)} шт
-                {r.cm !== null && <span className="block text-xs text-neutral-400">{formatLength(r.cm)}</span>}
+                <Amount total={r} multiplier={1} />
               </td>
               <td className="py-3 text-right">
-                {formatCount(r.pieces)} шт
-                {r.totalCm !== null && <span className="block text-xs text-neutral-400">{formatLength(r.totalCm)}</span>}
+                <Amount total={r} multiplier={devices} />
               </td>
             </tr>
           ))}
@@ -130,6 +102,28 @@ function PiecesTable({ rows, forDevices, withTotal }: { rows: MaterialTotal[]; f
         )}
       </table>
     </div>
+  );
+}
+
+/** Позиции с длиной: главное — метраж, отрезки мелко сбоку. Остальные — штуки. */
+function Amount({ total, multiplier }: { total: MaterialTotal; multiplier: number }) {
+  if (total.cm === null) return <>{formatCount(total.count * multiplier)} шт</>;
+  return <Length cm={total.cm * multiplier} detail={formatSegments(total.segments, multiplier)} />;
+}
+
+export function Length({ cm, detail }: { cm: number; detail: string }) {
+  return (
+    <>
+      <span className="mr-2 text-xs text-neutral-400">
+        {detail.split(" + ").map((part, i) => (
+          <span key={i} className="whitespace-nowrap">
+            {i > 0 && " + "}
+            {part}
+          </span>
+        ))}
+      </span>
+      <span className="whitespace-nowrap">{formatLength(cm)}</span>
+    </>
   );
 }
 

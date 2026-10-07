@@ -15,6 +15,8 @@ export type MaterialItem = {
 
 export type MaterialItemOrder = MaterialItem & { pieces: number; totalCm: number | null };
 
+export type Segment = { count: number; lengthCm: number };
+
 export type MaterialTotal = {
   name: string;
   code?: string;
@@ -22,6 +24,8 @@ export type MaterialTotal = {
   /** На одно изделие */
   count: number;
   cm: number | null;
+  /** Отрезки на одно изделие (для позиций с длиной) */
+  segments: Segment[];
   /** На заказ */
   pieces: number;
   totalCm: number | null;
@@ -38,10 +42,13 @@ export function calcMaterials(items: MaterialItem[], devices: number) {
   const totals = new Map<string, MaterialTotal>();
   for (const r of rows) {
     const key = r.code ?? r.name;
-    const t = totals.get(key) ?? { name: r.name, code: r.code, category: r.category, count: 0, cm: null, pieces: 0, totalCm: null };
+    const t = totals.get(key) ?? { name: r.name, code: r.code, category: r.category, count: 0, cm: null, segments: [], pieces: 0, totalCm: null };
     t.count += r.count;
     t.pieces += r.pieces;
-    if (r.lengthCm !== undefined) t.cm = (t.cm ?? 0) + r.lengthCm * r.count;
+    if (r.lengthCm !== undefined) {
+      t.cm = (t.cm ?? 0) + r.lengthCm * r.count;
+      t.segments.push({ count: r.count, lengthCm: r.lengthCm });
+    }
     if (r.totalCm !== null) t.totalCm = (t.totalCm ?? 0) + r.totalCm;
     totals.set(key, t);
   }

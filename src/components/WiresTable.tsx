@@ -1,6 +1,9 @@
 import { pluralDevices, Stat } from "./ProductCalculator";
+import { Length } from "./MaterialsSections";
 import { calcWires, type WireColor, type WireCut } from "@/lib/wires";
-import { formatCount, formatLength } from "@/lib/format";
+import { formatCount, formatLength, plural } from "@/lib/format";
+
+const segmentsWord = (n: number) => `${formatCount(n)} ${plural(n, ["відрізок", "відрізки", "відрізків"])}`;
 
 const swatch: Record<WireColor, string> = {
   червоний: "bg-red-600",
@@ -16,8 +19,7 @@ export function WiresTable({ cuts, devices }: { cuts: WireCut[]; devices: number
   return (
     <div>
       <div className="mt-4 grid gap-4 sm:grid-cols-3">
-        <Stat label="Кабель" value={formatLength(totalCm)} />
-        <Stat label="Відрізків" value={formatCount(totalPieces)} />
+        <Stat label="Кабель" value={formatLength(totalCm)} note={segmentsWord(totalPieces)} />
       </div>
 
       <h3 className="mt-8 text-xs text-neutral-500">Потрібно кабелю</h3>
@@ -27,7 +29,6 @@ export function WiresTable({ cuts, devices }: { cuts: WireCut[]; devices: number
             <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
               <th className="py-2 pr-3 font-normal">Провід</th>
               <th className="py-2 pr-3 font-normal">Колір</th>
-              <th className="py-2 pr-3 text-right font-normal">Відрізків</th>
               <th className="py-2 text-right font-normal">Довжина</th>
             </tr>
           </thead>
@@ -38,9 +39,8 @@ export function WiresTable({ cuts, devices }: { cuts: WireCut[]; devices: number
                 <td className="py-3 pr-3">
                   <Color color={t.color} />
                 </td>
-                <td className="py-3 pr-3 text-right">{formatCount(t.pieces)}</td>
                 <td className="py-3 text-right">
-                  {formatLength(t.totalCm)}
+                  <Length cm={t.totalCm} detail={segmentsWord(t.pieces)} />
                   {t.replaceableCm > 0 && (
                     <span className="block text-xs text-neutral-400">
                       з них {formatLength(t.replaceableCm)} можна замінити
@@ -55,8 +55,9 @@ export function WiresTable({ cuts, devices }: { cuts: WireCut[]; devices: number
               <td className="py-3 pr-3" colSpan={2}>
                 Разом на {formatCount(devices)} {pluralDevices(devices)}
               </td>
-              <td className="py-3 pr-3 text-right">{formatCount(totalPieces)}</td>
-              <td className="py-3 text-right">{formatLength(totalCm)}</td>
+              <td className="py-3 text-right">
+                <Length cm={totalCm} detail={segmentsWord(totalPieces)} />
+              </td>
             </tr>
           </tfoot>
         </table>
@@ -64,13 +65,12 @@ export function WiresTable({ cuts, devices }: { cuts: WireCut[]; devices: number
 
       <h3 className="mt-10 text-xs text-neutral-500">Нарізка по вузлах</h3>
       <div className="mt-2 overflow-x-auto">
-        <table className="w-full min-w-[640px] text-sm tabular-nums">
+        <table className="w-full min-w-[600px] text-sm tabular-nums">
           <thead>
             <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
               <th className="py-2 pr-3 font-normal">Вузол</th>
               <th className="py-2 pr-3 font-normal">Провід</th>
               <th className="py-2 pr-3 font-normal">Колір</th>
-              <th className="py-2 pr-3 text-right font-normal">Відрізок</th>
               <th className="py-2 pr-3 text-right font-normal">На виріб</th>
               <th className="py-2 text-right font-normal">Всього</th>
             </tr>
@@ -88,11 +88,11 @@ export function WiresTable({ cuts, devices }: { cuts: WireCut[]; devices: number
                   <td className="py-3 pr-3">
                     <Color color={r.colors[0]} alternatives={r.colors.slice(1)} />
                   </td>
-                  <td className="py-3 pr-3 text-right">{formatLength(r.lengthCm)}</td>
-                  <td className="py-3 pr-3 text-right">{formatCount(r.count)} шт</td>
+                  <td className="py-3 pr-3 text-right">
+                    <Length cm={r.lengthCm * r.count} detail={`${formatCount(r.count)} × ${formatLength(r.lengthCm)}`} />
+                  </td>
                   <td className="py-3 text-right">
-                    {formatCount(r.pieces)} шт
-                    <span className="block text-xs text-neutral-400">{formatLength(r.totalCm)}</span>
+                    <Length cm={r.totalCm} detail={`${formatCount(r.pieces)} × ${formatLength(r.lengthCm)}`} />
                   </td>
                 </tr>
               );
