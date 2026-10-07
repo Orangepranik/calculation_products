@@ -28,8 +28,7 @@ export const vynosnaAntenaMaterials: MaterialItem[] = [
   component(21, 4),
   { name: "Термоусадка", code: "PRODUCT22", category: "cut", count: 4, lengthCm: 1.5 },
   { name: "Термоусадка", code: "PRODUCT23", category: "cut", count: 1, lengthCm: 5 },
-  // В исходных данных «4x12м» — взято буквально (4 отрезка по 12 м). Уточнить: возможно, 12 см.
-  { name: "RG-316", code: "PRODUCT24", category: "cut", count: 4, lengthCm: 1200 },
+  { name: "RG-316", code: "PRODUCT24", category: "cut", count: 4, lengthCm: 12 },
 ];
 
 /** Виносна антена — нарезка кабеля */
