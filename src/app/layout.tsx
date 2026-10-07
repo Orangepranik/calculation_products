@@ -1,40 +1,35 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import Link from "next/link";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" });
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin", "cyrillic"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin", "cyrillic"],
+});
 
 export const metadata: Metadata = {
-  title: { default: "Калькулятор производства", template: "%s · Калькулятор производства" },
-  description: "Расчёт материалов для закупки под план выпуска продукции",
+  title: "Калькуляция продукции",
+  description: "Каталог продукции и расчёт материалов",
 };
 
-const nav = [
-  { href: "/", label: "Расчёт" },
-  { href: "/products", label: "Продукция" },
-  { href: "/materials", label: "Материалы" },
-];
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ru" className={inter.variable}>
-      <body className="font-sans">
-        <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <nav className="mx-auto flex max-w-5xl items-center gap-1 px-4 py-3">
-            <span className="mr-4 font-semibold">⚙️ Калькулятор</span>
-            {nav.map((n) => (
-              <Link
-                key={n.href}
-                href={n.href}
-                className="rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                {n.label}
-              </Link>
-            ))}
-          </nav>
+    <html lang="ru" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col font-sans">
+        <header className="border-b border-neutral-100">
+          <div className="mx-auto flex h-14 max-w-5xl items-center px-4 sm:px-6">
+            <Link href="/" className="text-sm font-medium tracking-tight">
+              Калькуляция
+            </Link>
+          </div>
         </header>
-        <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">{children}</main>
       </body>
     </html>
   );

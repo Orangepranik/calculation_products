@@ -1,20 +1,23 @@
-import { getProductsWithRecipe } from "@/server/loaders";
-import { Calculator } from "./calculator";
+import Link from "next/link";
+import { products } from "@/data/products";
+import { ProductImage } from "@/components/ProductImage";
 
-export const dynamic = "force-dynamic";
-
-export default async function HomePage() {
-  const products = await getProductsWithRecipe();
+export default function Home() {
   return (
     <>
-      <h1 className="text-2xl font-semibold">Расчёт закупки материалов</h1>
-      <p className="mt-1 mb-6 text-sm text-slate-500">
-        Укажите, сколько продукции нужно произвести — калькулятор посчитает, сколько материалов
-        закупить с учётом норм расхода, потерь, складских остатков и фасовки.
-      </p>
-      <Calculator
-        products={products.map((p) => ({ id: p.id, name: p.name, unit: p.unit, hasRecipe: p.recipe.length > 0 }))}
-      />
+      <h1 className="text-2xl font-semibold tracking-tight">Продукция</h1>
+      <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+        {products.map((product) => (
+          <li key={product.slug}>
+            <Link href={`/products/${product.slug}`} className="group block">
+              <ProductImage product={product} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
+              <p className="mt-3 text-sm font-medium text-neutral-900 transition-colors group-hover:text-neutral-500">
+                {product.name}
+              </p>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </>
   );
 }
