@@ -7,7 +7,7 @@ export function ProductImage({ product, sizes, compact }: { product: Product; si
       {product.image ? (
         <Image src={product.image} alt={product.name} fill sizes={sizes} className={compact ? "object-contain p-2" : "object-contain p-6"} />
       ) : (
-        !compact && <div className="flex h-full items-center justify-center text-xs text-neutral-400">Фото скоро</div>
+        !compact && <div className="flex h-full items-center justify-center text-xs text-neutral-400">Фото незабаром</div>
       )}
     </div>
   );

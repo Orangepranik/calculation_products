@@ -17,26 +17,64 @@ export type Part = {
   perAssembly: number;
 };
 
-export type PartCalc = Part & { minutesPerUnit: number; gramsPerUnit: number | null };
+export type PartOrder = Part & {
+  minutesPerUnit: number;
+  gramsPerUnit: number | null;
+  /** Сколько деталей нужно на заказ */
+  needed: number;
+  /** Сколько печатей (партий) нужно запустить */
+  prints: number;
+  /** Лишние детали с последней печати */
+  surplus: number;
+  /** Точный расход — только на нужные детали */
+  minutes: number;
+  grams: number | null;
+  /** Расход по полным печатям */
+  printMinutes: number;
+  printGrams: number | null;
+};
 
-export type AssemblyCalc = {
-  parts: PartCalc[];
+export type OrderCalc = {
+  devices: number;
+  parts: PartOrder[];
   totalMinutes: number;
   totalGrams: number;
-  /** Детали без указанного веса — в totalGrams не вошли */
+  totalPrintMinutes: number;
+  totalPrintGrams: number;
+  totalPrints: number;
+  /** Детали без указанного веса — в граммы не вошли */
   missingGrams: string[];
 };
 
-export function calcAssembly(parts: Part[]): AssemblyCalc {
-  const rows = parts.map((p) => ({
-    ...p,
-    minutesPerUnit: p.batch.minutes / p.batch.quantity,
-    gramsPerUnit: p.batch.grams === null ? null : p.batch.grams / p.batch.quantity,
-  }));
+export function calcOrder(parts: Part[], devices: number): OrderCalc {
+  const rows = parts.map((p): PartOrder => {
+    const { quantity, minutes, grams } = p.batch;
+    const needed = devices * p.perAssembly;
+    const prints = Math.ceil(needed / quantity);
+    const minutesPerUnit = minutes / quantity;
+    const gramsPerUnit = grams === null ? null : grams / quantity;
+    return {
+      ...p,
+      minutesPerUnit,
+      gramsPerUnit,
+      needed,
+      prints,
+      surplus: prints * quantity - needed,
+      minutes: minutesPerUnit * needed,
+      grams: gramsPerUnit === null ? null : gramsPerUnit * needed,
+      printMinutes: prints * minutes,
+      printGrams: grams === null ? null : prints * grams,
+    };
+  });
+  const sum = (f: (r: PartOrder) => number | null) => rows.reduce((s, r) => s + (f(r) ?? 0), 0);
   return {
+    devices,
     parts: rows,
-    totalMinutes: rows.reduce((s, r) => s + r.minutesPerUnit * r.perAssembly, 0),
-    totalGrams: rows.reduce((s, r) => s + (r.gramsPerUnit ?? 0) * r.perAssembly, 0),
+    totalMinutes: sum((r) => r.minutes),
+    totalGrams: sum((r) => r.grams),
+    totalPrintMinutes: sum((r) => r.printMinutes),
+    totalPrintGrams: sum((r) => r.printGrams),
+    totalPrints: sum((r) => r.prints),
     missingGrams: rows.filter((r) => r.gramsPerUnit === null).map((r) => r.name),
   };
 }

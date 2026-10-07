@@ -14,18 +14,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Калькуляция продукции",
-  description: "Каталог продукции и расчёт материалов",
+  title: "Калькуляція продукції",
+  description: "Каталог продукції та розрахунок матеріалів",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ru" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="uk" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <header className="border-b border-neutral-100">
           <div className="mx-auto flex h-14 max-w-5xl items-center px-4 sm:px-6">
             <Link href="/" className="text-sm font-medium tracking-tight">
-              Калькуляция
+              Калькуляція
             </Link>
           </div>
         </header>

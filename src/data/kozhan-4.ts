@@ -1,4 +1,6 @@
 import { hm, type Part } from "@/lib/calc";
+import type { WireCut } from "@/lib/wires";
+import type { MaterialItem } from "@/lib/bom";
 
 /** КОЖАН 4.0 — 3D-печать. Партия: сколько деталей за одну печать, время, пластик. */
 export const kozhan4Parts: Part[] = [
@@ -14,4 +16,62 @@ export const kozhan4Parts: Part[] = [
   { no: 12, name: "Холдер", batch: { quantity: 3, minutes: hm(10, 46), grams: 273.21 }, perAssembly: 1 },
   { no: 13, name: "М'яка заглушка AV", batch: { quantity: 100, minutes: hm(5), grams: 57.12 }, perAssembly: 1 },
   { no: 15, name: "М'яка заглушка Type-C", batch: { quantity: 100, minutes: hm(2, 51), grams: 33 }, perAssembly: 1 },
+];
+
+/** КОЖАН 4.0 — нарезка кабеля по узлам. "білий/червоний" → colors: ["білий", "червоний"] (первый — приоритет). */
+export const kozhan4Wires: WireCut[] = [
+  { group: "PRODUCT1", gauge: "AWG24", colors: ["червоний"], lengthCm: 4, count: 1 },
+  { group: "PRODUCT1", gauge: "AWG24", colors: ["білий"], lengthCm: 9, count: 1 },
+  { group: "PRODUCT1", gauge: "AWG24", colors: ["чорний"], lengthCm: 9, count: 1 },
+  { group: "PRODUCT2", gauge: "AWG30", colors: ["червоний"], lengthCm: 9, count: 1 },
+  { group: "PRODUCT2", gauge: "AWG30", colors: ["білий"], lengthCm: 9, count: 1 },
+  { group: "PRODUCT2", gauge: "AWG30", colors: ["жовтий"], lengthCm: 9, count: 1 },
+  { group: "PRODUCT2", gauge: "AWG30", colors: ["жовтий"], lengthCm: 11.5, count: 1 },
+  { group: "PRODUCT2", gauge: "AWG30", colors: ["червоний"], lengthCm: 11.5, count: 1 },
+  { group: "PRODUCT3", gauge: "AWG24", colors: ["білий", "червоний"], lengthCm: 14, count: 1 },
+  { group: "PRODUCT4", gauge: "AWG24", colors: ["чорний"], lengthCm: 5, count: 1 },
+  { group: "PRODUCT5", gauge: "AWG24", colors: ["білий", "червоний"], lengthCm: 11.5, count: 1 },
+  { group: "PRODUCT6", gauge: "AWG24", colors: ["чорний"], lengthCm: 10.5, count: 1 },
+  { group: "PRODUCT6", gauge: "AWG24", colors: ["червоний"], lengthCm: 10.5, count: 1 },
+  { group: "PRODUCT6", gauge: "AWG24", colors: ["чорний"], lengthCm: 7.5, count: 2 },
+];
+
+/** КОЖАН 4.0 — список материалов на одно изделие, в порядке спецификации. PRODUCTn — внутренние названия фирмы. */
+export const kozhan4Materials: MaterialItem[] = [
+  { name: "PRODUCT7", category: "component", count: 1 },
+  { name: "PRODUCT8", category: "component", count: 1 },
+  { name: "Гвинт монтажу довгий", category: "fastener", count: 2 },
+  { name: "PRODUCT9", category: "component", count: 1 },
+  { name: "Двосторонній скотч", category: "cut", count: 3, lengthCm: 4 },
+  { name: "PRODUCT10", category: "component", count: 1 },
+  { name: "PRODUCT11", category: "component", count: 1 },
+  { name: "PRODUCT12", category: "component", count: 1 },
+  { name: "PRODUCT13", category: "component", count: 1 },
+  { name: "Гвинт монтажу довгий", category: "fastener", count: 2 },
+  { name: "PRODUCT14", category: "component", count: 1 },
+  { name: "Гвинт монтажу короткий", category: "fastener", count: 3 },
+  { name: "PRODUCT15", category: "component", count: 6 },
+  { name: "Двосторонній скотч Polax 12×5 мм", category: "cut", count: 1, lengthCm: 4.5 },
+  { name: "Нікелева стрічка", category: "cut", count: 2, lengthCm: 6.5 },
+  { name: "Нікелева стрічка", category: "cut", count: 2, lengthCm: 2.5 },
+  { name: "Нікелева стрічка", category: "cut", count: 2, lengthCm: 3 },
+  { name: "PRODUCT16", category: "component", count: 6 },
+  { name: "PRODUCT17", category: "component", count: 1 },
+  { name: "PRODUCT18", category: "component", count: 1 },
+  { name: "PRODUCT19", category: "component", count: 1 },
+  { name: "PRODUCT20", category: "component", count: 1 },
+  { name: "PRODUCT21", category: "component", count: 3 },
+  { name: "PRODUCT22", category: "component", count: 1 },
+  { name: "PRODUCT23", category: "component", count: 1 },
+  { name: "PRODUCT24", category: "component", count: 1 },
+  { name: "PRODUCT25", category: "component", count: 1 },
+  { name: "PRODUCT26", category: "component", count: 1 },
+  { name: "PRODUCT27", category: "component", count: 1 },
+  { name: "PRODUCT28", category: "component", count: 1 },
+  { name: "PRODUCT29", category: "component", count: 4 },
+  { name: "PRODUCT30", category: "component", count: 4 },
+  { name: "Гвинт кріплення більший", category: "fastener", count: 2 },
+  { name: "PRODUCT31", category: "component", count: 1 },
+  { name: "Гвинт кріплення більший", category: "fastener", count: 7 },
+  { name: "Шлейка велкро", category: "fastener", count: 2 },
 ];

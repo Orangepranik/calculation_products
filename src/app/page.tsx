@@ -5,7 +5,7 @@ import { ProductImage } from "@/components/ProductImage";
 export default function Home() {
   return (
     <>
-      <h1 className="text-2xl font-semibold tracking-tight">Продукция</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Продукція</h1>
       <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
         {products.map((product) => (
           <li key={product.slug}>
