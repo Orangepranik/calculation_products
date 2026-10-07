@@ -1,0 +1,8 @@
+* text=auto eol=lf
+
+# Бинарные файлы
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
