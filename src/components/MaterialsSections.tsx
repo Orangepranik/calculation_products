@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { pluralDevices } from "./ProductCalculator";
+import type { SectionId } from "@/lib/positions";
 import { calcMaterials, type MaterialCategory, type MaterialItem, type MaterialTotal } from "@/lib/bom";
 import { formatCount, formatLength, formatSegments } from "@/lib/format";
 
@@ -17,17 +18,17 @@ export function MaterialsSections({ items, devices }: { items: MaterialItem[]; d
   return (
     <>
       {components.length > 0 && (
-        <Section title="Комплектуючі" first>
+        <Section id="components" title="Комплектуючі" first>
           <MaterialsTable rows={components} devices={devices} forDevices={forDevices} withTotal />
         </Section>
       )}
       {fasteners.length > 0 && (
-        <Section title="Кріплення">
+        <Section id="fasteners" title="Кріплення">
           <MaterialsTable rows={fasteners} devices={devices} forDevices={forDevices} />
         </Section>
       )}
       {cuts.length > 0 && (
-        <Section title="Нарізання на відрізки">
+        <Section id="cuts" title="Нарізання на відрізки">
           <MaterialsTable rows={cuts} devices={devices} forDevices={forDevices} />
         </Section>
       )}
@@ -40,15 +41,15 @@ export function PackagingSection({ items, devices }: { items: MaterialItem[]; de
   const packaging = calcMaterials(items, devices).totals.filter((t) => t.category === "packaging");
   if (packaging.length === 0) return null;
   return (
-    <Section title="Пакування">
+    <Section id="packaging" title="Пакування">
       <MaterialsTable rows={packaging} devices={devices} forDevices={forDevicesLabel(devices)} />
     </Section>
   );
 }
 
-function Section({ title, first, children }: { title: string; first?: boolean; children: ReactNode }) {
+function Section({ id, title, first, children }: { id: SectionId; title: string; first?: boolean; children: ReactNode }) {
   return (
-    <section className={first ? "mt-12" : "mt-16"}>
+    <section id={id} className={`scroll-mt-6 ${first ? "mt-12" : "mt-16"}`}>
       <h2 className="text-sm font-medium text-neutral-500">{title}</h2>
       {children}
     </section>
