@@ -6,12 +6,13 @@ import { formatCount, formatLength, formatSegments } from "@/lib/format";
 
 const forDevicesLabel = (devices: number) => `На ${formatCount(devices)} ${pluralDevices(devices)}`;
 
-/** Комплектующие, крепёж (одинаковые позиции сложены), нарезка на отрезки */
+/** Комплектующие, крепёж, расходники (одинаковые позиции сложены), нарезка на отрезки */
 export function MaterialsSections({ items, devices }: { items: MaterialItem[]; devices: number }) {
   const { totals } = calcMaterials(items, devices);
   const by = (c: MaterialCategory) => totals.filter((t) => t.category === c);
   const components = by("component");
   const fasteners = by("fastener");
+  const consumables = by("consumable");
   const cuts = by("cut");
   const forDevices = forDevicesLabel(devices);
 
@@ -25,6 +26,11 @@ export function MaterialsSections({ items, devices }: { items: MaterialItem[]; d
       {fasteners.length > 0 && (
         <Section id="fasteners" title="Кріплення">
           <MaterialsTable rows={fasteners} devices={devices} forDevices={forDevices} />
+        </Section>
+      )}
+      {consumables.length > 0 && (
+        <Section id="consumables" title="Витратні матеріали">
+          <MaterialsTable rows={consumables} devices={devices} forDevices={forDevices} />
         </Section>
       )}
       {cuts.length > 0 && (

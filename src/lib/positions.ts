@@ -2,13 +2,14 @@ import { calcMaterials, type MaterialCategory, type MaterialItem } from "./bom";
 import type { Part } from "./calc";
 import type { WireCut } from "./wires";
 
-export type SectionId = "components" | "fasteners" | "cuts" | "print" | "wires" | "packaging";
+export type SectionId = "components" | "fasteners" | "consumables" | "cuts" | "print" | "wires" | "packaging";
 
 export type SectionCount = { id: SectionId; label: string; count: number };
 
 const materialSections: { id: SectionId; label: string; category: MaterialCategory }[] = [
   { id: "components", label: "Комплектуючі", category: "component" },
   { id: "fasteners", label: "Кріплення", category: "fastener" },
+  { id: "consumables", label: "Витратні матеріали", category: "consumable" },
   { id: "cuts", label: "Нарізання на відрізки", category: "cut" },
 ];
 
