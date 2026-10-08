@@ -3,6 +3,7 @@ import type { WireCut } from "@/lib/wires";
 import type { MaterialItem } from "@/lib/bom";
 import { kozhan4Materials, kozhan4Parts, kozhan4Wires } from "./kozhan-4";
 import { vynosnaAntenaMaterials, vynosnaAntenaWires } from "./vynosna-antena";
+import { antena5gMaterials } from "./antena-5g";
 
 export type Product = {
   slug: string;
@@ -19,6 +20,7 @@ export type Product = {
 
 export const products: Product[] = [
   { slug: "vynosna-antena", name: "Виносна антена", materials: vynosnaAntenaMaterials, wires: vynosnaAntenaWires },
+  { slug: "antena-5g", name: "Антена 5G", materials: antena5gMaterials },
   { slug: "kozhan-3", name: "КОЖАН 3.0" },
   { slug: "kozhan-4", name: "КОЖАН 4.0", parts: kozhan4Parts, wires: kozhan4Wires, materials: kozhan4Materials },
   { slug: "gidra-2u", name: "ГІДРА 2U" },
