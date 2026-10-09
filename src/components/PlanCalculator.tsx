@@ -1,23 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import type { Product } from "@/data/products";
-import { calcPlan, planPrintJobs, type PlanProduct } from "@/lib/plan";
+import { calcPlan, planPrintJobs } from "@/lib/plan";
 import { formatCount, formatGrams, formatLength, formatMinutes, plural } from "@/lib/format";
-import { ProductSections, pluralDevices, Stat } from "./ProductCalculator";
+import { Stat } from "./ProductCalculator";
+import { ProductFolder } from "./ProductFolder";
 import { PrintersPanel } from "./PrintersPanel";
 
 const segmentsWord = (n: number) => `${formatCount(n)} ${plural(n, ["відрізок", "відрізки", "відрізків"])}`;
 
 export function PlanCalculator({ products }: { products: Product[] }) {
   const [qty, setQty] = useState<Record<string, string>>({});
-  const [open, setOpen] = useState<Record<string, boolean>>({});
   const plan = calcPlan(
     products.map((product) => {
       const n = Number.parseInt(qty[product.slug] ?? "", 10);
       return { product, qty: Number.isFinite(n) && n > 0 ? n : 0 };
     }),
+    products,
   );
 
   return (
@@ -71,79 +71,11 @@ export function PlanCalculator({ products }: { products: Product[] }) {
           <h2 className="mt-14 text-sm font-medium text-neutral-500">Продукти в плані</h2>
           <div className="mt-4 space-y-3">
             {plan.products.map((p) => (
-              <ProductFolder
-                key={p.product.slug}
-                item={p}
-                open={open[p.product.slug] ?? false}
-                onToggle={() => setOpen((o) => ({ ...o, [p.product.slug]: !o[p.product.slug] }))}
-              />
+              <ProductFolder key={p.product.slug} item={p} catalog={products} />
             ))}
           </div>
         </>
       )}
     </>
-  );
-}
-
-function ProductFolder({ item, open, onToggle }: { item: PlanProduct; open: boolean; onToggle: () => void }) {
-  const { product, qty } = item;
-  const panelId = `plan-${product.slug}`;
-  const facts = [
-    `${formatCount(qty)} ${pluralDevices(qty)}`,
-    `${formatCount(item.positions)} ${plural(item.positions, ["позиція", "позиції", "позицій"])}`,
-    item.prints > 0 && `пластик ${formatGrams(item.grams)}`,
-    item.prints > 0 && `друк ${formatMinutes(item.minutes)}`,
-    item.cablePieces > 0 && `кабель ${formatLength(item.cableCm)}`,
-  ].filter(Boolean);
-
-  return (
-    <div className="rounded-lg border border-neutral-200">
-      <div className="flex items-center gap-4 p-4">
-        <div className="min-w-0 flex-1">
-          <p className="font-medium">
-            {product.name}
-            {product.subtitle && <span className="ml-2 text-xs font-normal text-neutral-400">{product.subtitle}</span>}
-          </p>
-          <p className="mt-1 text-xs text-neutral-500 tabular-nums">{facts.join(" · ")}</p>
-        </div>
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={open}
-          aria-controls={panelId}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm transition-colors hover:border-neutral-900"
-        >
-          Детальніше
-          <svg
-            aria-hidden
-            viewBox="0 0 16 16"
-            className={`size-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
-            <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </div>
-
-      {open && (
-        <div id={panelId} className="border-t border-neutral-100 px-4 pb-6">
-          <ProductSections
-            parts={product.parts}
-            wires={product.wires}
-            materials={product.materials}
-            devices={qty}
-            idPrefix={`${product.slug}-`}
-          />
-          <Link
-            href={`/products/${product.slug}`}
-            className="mt-8 inline-block text-sm text-neutral-500 transition-colors hover:text-neutral-900"
-          >
-            Сторінка продукту →
-          </Link>
-        </div>
-      )}
-    </div>
   );
 }

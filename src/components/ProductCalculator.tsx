@@ -9,14 +9,26 @@ import { WiresTable } from "./WiresTable";
 import { MaterialsSections, ProcessSections } from "./MaterialsSections";
 import type { MaterialItem } from "@/lib/bom";
 import { countPositions } from "@/lib/positions";
+import { subassembliesOf } from "@/lib/assembly";
+import type { Product } from "@/data/products";
+import { Subassemblies } from "./ProductFolder";
 
 type Props = { parts?: Part[]; wires?: WireCut[]; materials?: MaterialItem[] };
 
-export function ProductCalculator({ parts, wires, materials }: Props) {
+export function ProductCalculator({ product, catalog }: { product: Product; catalog: Product[] }) {
+  const { parts, wires, materials } = product;
   const [input, setInput] = useState("1");
   const parsed = Number.parseInt(input, 10);
   const devices = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-  const sections = countPositions({ parts, wires, materials });
+  // Изделия своего производства тоже собираются — их позиции входят в сводку
+  const sections = [
+    ...countPositions(product),
+    ...subassembliesOf(product, catalog).map((s) => ({
+      id: "own-production",
+      label: s.product.name,
+      count: countPositions(s.product).reduce((sum, x) => sum + x.count, 0),
+    })),
+  ];
   const totalPositions = sections.reduce((s, x) => s + x.count, 0);
 
   return (
@@ -26,7 +38,7 @@ export function ProductCalculator({ parts, wires, materials }: Props) {
         <p className="mt-1 text-xl font-semibold tracking-tight tabular-nums">{totalPositions}</p>
         <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm">
           {sections.map((x) => (
-            <li key={x.id}>
+            <li key={x.label}>
               <a href={`#${x.id}`} className="text-neutral-500 transition-colors hover:text-neutral-900">
                 {x.label} <span className="tabular-nums text-neutral-900">{x.count}</span>
               </a>
@@ -50,6 +62,7 @@ export function ProductCalculator({ parts, wires, materials }: Props) {
       </label>
 
       <ProductSections parts={parts} wires={wires} materials={materials} devices={devices} />
+      <Subassemblies product={product} devices={devices} catalog={catalog} />
     </>
   );
 }

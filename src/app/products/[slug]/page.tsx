@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getProduct, products } from "@/data/products";
 import { ProductImage } from "@/components/ProductImage";
 import { ProductCalculator } from "@/components/ProductCalculator";
+import { hasCalculation } from "@/lib/assembly";
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
@@ -32,12 +33,8 @@ export default async function ProductPage(props: PageProps<"/products/[slug]">) 
           {product.subtitle && <p className="mt-1 text-sm text-neutral-500">{product.subtitle}</p>}
         </div>
       </div>
-      {product.parts || product.wires || product.materials ? (
-        <ProductCalculator
-          parts={product.parts}
-          wires={product.wires}
-          materials={product.materials}
-        />
+      {hasCalculation(product) ? (
+        <ProductCalculator product={product} catalog={products.filter(hasCalculation)} />
       ) : (
         <p className="mt-10 text-sm text-neutral-400">Матеріали та формули ще не задані.</p>
       )}

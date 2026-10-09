@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { products } from "@/data/products";
 import { PlanCalculator } from "@/components/PlanCalculator";
+import { hasCalculation } from "@/lib/assembly";
 
 export const metadata: Metadata = { title: "План виробництва" };
 
 export default function PlanPage() {
-  const withData = products.filter((p) => p.parts || p.wires || p.materials);
+  const withData = products.filter(hasCalculation);
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight">План виробництва</h1>
