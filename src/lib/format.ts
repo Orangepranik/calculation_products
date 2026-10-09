@@ -42,3 +42,13 @@ export function plural(n: number, [one, few, many]: [string, string, string]): s
 export function formatSegments(segments: { count: number; lengthCm: number }[], multiplier = 1): string {
   return segments.map((s) => `${int.format(s.count * multiplier)} × ${formatLength(s.lengthCm)}`).join(" + ");
 }
+
+/** 2440 → "1 день 16 год 40 хв" */
+export function formatDuration(minutes: number): string {
+  const totalMin = Math.round(minutes);
+  const d = Math.floor(totalMin / 1440);
+  const rest = totalMin - d * 1440;
+  return [d ? `${d} ${plural(d, ["день", "дні", "днів"])}` : "", rest || !d ? formatMinutes(rest) : ""]
+    .filter(Boolean)
+    .join(" ");
+}

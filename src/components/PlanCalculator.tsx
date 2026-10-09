@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/data/products";
-import { calcPlan, type PlanProduct } from "@/lib/plan";
+import { calcPlan, planPrintJobs, type PlanProduct } from "@/lib/plan";
 import { formatCount, formatGrams, formatLength, formatMinutes, plural } from "@/lib/format";
 import { ProductSections, pluralDevices, Stat } from "./ProductCalculator";
+import { PrintersPanel } from "./PrintersPanel";
 
 const segmentsWord = (n: number) => `${formatCount(n)} ${plural(n, ["відрізок", "відрізки", "відрізків"])}`;
 
@@ -64,6 +65,8 @@ export function PlanCalculator({ products }: { products: Product[] }) {
               <Stat label="Кабель" value={formatLength(plan.cableCm)} note={segmentsWord(plan.cablePieces)} />
             )}
           </div>
+
+          {plan.prints > 0 && <PrintersPanel jobs={planPrintJobs(plan)} />}
 
           <h2 className="mt-14 text-sm font-medium text-neutral-500">Продукти в плані</h2>
           <div className="mt-4 space-y-3">

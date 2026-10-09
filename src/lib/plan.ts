@@ -1,3 +1,4 @@
+import type { PrintJob } from "./schedule";
 import { calcOrder } from "./calc";
 import { calcWires } from "./wires";
 import { countPositions } from "./positions";
@@ -51,4 +52,15 @@ export function calcPlan(lines: PlanLine[]): PlanCalc {
     cableCm: sum((p) => p.cableCm),
     cablePieces: sum((p) => p.cablePieces),
   };
+}
+
+/** Все печати плана (полными партиями) — для раскладки по принтерам */
+export function planPrintJobs(plan: PlanCalc): PrintJob[] {
+  return plan.products.flatMap(({ product, qty }) =>
+    product.parts
+      ? calcOrder(product.parts, qty).parts.flatMap((p) =>
+          Array.from({ length: p.prints }, () => ({ label: `${product.name} · ${p.name}`, minutes: p.batch.minutes })),
+        )
+      : [],
+  );
 }
