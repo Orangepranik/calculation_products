@@ -49,20 +49,29 @@ export function ProductCalculator({ parts, wires, materials }: Props) {
         />
       </label>
 
-      {materials && <MaterialsSections items={materials} devices={devices} />}
+      <ProductSections parts={parts} wires={wires} materials={materials} devices={devices} />
+    </>
+  );
+}
+
+/** Все таблицы продукта на заданное количество. idPrefix — чтобы якоря не повторялись, если продуктов на странице несколько */
+export function ProductSections({ parts, wires, materials, devices, idPrefix = "" }: Props & { devices: number; idPrefix?: string }) {
+  return (
+    <>
+      {materials && <MaterialsSections items={materials} devices={devices} idPrefix={idPrefix} />}
       {parts && (
-        <section id="print" className="mt-16 scroll-mt-6">
+        <section id={`${idPrefix}print`} className="mt-16 scroll-mt-6">
           <h2 className="text-sm font-medium text-neutral-500">3D-друк</h2>
           <PartsTable parts={parts} devices={devices} />
         </section>
       )}
       {wires && (
-        <section id="wires" className="mt-16 scroll-mt-6">
+        <section id={`${idPrefix}wires`} className="mt-16 scroll-mt-6">
           <h2 className="text-sm font-medium text-neutral-500">Нарізання кабелю</h2>
           <WiresTable cuts={wires} devices={devices} />
         </section>
       )}
-      {materials && <ProcessSections items={materials} devices={devices} />}
+      {materials && <ProcessSections items={materials} devices={devices} idPrefix={idPrefix} />}
     </>
   );
 }

@@ -8,7 +8,7 @@ import { formatCount, formatLength, formatSegments } from "@/lib/format";
 const forDevicesLabel = (devices: number) => `На ${formatCount(devices)} ${pluralDevices(devices)}`;
 
 /** Комплектующие, крепёж, расходники (одинаковые позиции сложены), нарезка на отрезки — только позиции без процесса */
-export function MaterialsSections({ items, devices }: { items: MaterialItem[]; devices: number }) {
+export function MaterialsSections({ items, devices, idPrefix = "" }: { items: MaterialItem[]; devices: number; idPrefix?: string }) {
   const { totals } = calcMaterials(items, devices);
   const by = (c: MaterialCategory) => totals.filter((t) => t.category === c && !t.process);
   const components = by("component");
@@ -20,22 +20,22 @@ export function MaterialsSections({ items, devices }: { items: MaterialItem[]; d
   return (
     <>
       {components.length > 0 && (
-        <Section id="components" title="Комплектуючі" first>
+        <Section id="components" idPrefix={idPrefix} title="Комплектуючі" first>
           <MaterialsTable rows={components} devices={devices} forDevices={forDevices} withTotal />
         </Section>
       )}
       {fasteners.length > 0 && (
-        <Section id="fasteners" title="Кріплення">
+        <Section id="fasteners" idPrefix={idPrefix} title="Кріплення">
           <MaterialsTable rows={fasteners} devices={devices} forDevices={forDevices} />
         </Section>
       )}
       {consumables.length > 0 && (
-        <Section id="consumables" title="Витратні матеріали">
+        <Section id="consumables" idPrefix={idPrefix} title="Витратні матеріали">
           <MaterialsTable rows={consumables} devices={devices} forDevices={forDevices} />
         </Section>
       )}
       {cuts.length > 0 && (
-        <Section id="cuts" title="Нарізання на відрізки">
+        <Section id="cuts" idPrefix={idPrefix} title="Нарізання на відрізки">
           <MaterialsTable rows={cuts} devices={devices} forDevices={forDevices} />
         </Section>
       )}
@@ -44,10 +44,10 @@ export function MaterialsSections({ items, devices }: { items: MaterialItem[]; d
 }
 
 /** Процессы сборки (Пакування…) — каждый своим блоком в конце страницы */
-export function ProcessSections({ items, devices }: { items: MaterialItem[]; devices: number }) {
+export function ProcessSections({ items, devices, idPrefix = "" }: { items: MaterialItem[]; devices: number; idPrefix?: string }) {
   const { totals } = calcMaterials(items, devices);
   return listProcesses(items).map((process, i) => (
-    <Section key={process} id={processSectionId(i)} title={process}>
+    <Section key={process} id={processSectionId(i)} idPrefix={idPrefix} title={process}>
       <MaterialsTable
         rows={totals.filter((t) => t.process === process)}
         devices={devices}
@@ -57,9 +57,21 @@ export function ProcessSections({ items, devices }: { items: MaterialItem[]; dev
   ));
 }
 
-function Section({ id, title, first, children }: { id: SectionId; title: string; first?: boolean; children: ReactNode }) {
+function Section({
+  id,
+  idPrefix = "",
+  title,
+  first,
+  children,
+}: {
+  id: SectionId;
+  idPrefix?: string;
+  title: string;
+  first?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <section id={id} className={`scroll-mt-6 ${first ? "mt-12" : "mt-16"}`}>
+    <section id={`${idPrefix}${id}`} className={`scroll-mt-6 ${first ? "mt-12" : "mt-16"}`}>
       <h2 className="text-sm font-medium text-neutral-500">{title}</h2>
       {children}
     </section>
