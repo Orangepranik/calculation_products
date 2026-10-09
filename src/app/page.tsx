@@ -14,6 +14,7 @@ export default function Home() {
               <p className="mt-3 text-sm font-medium text-neutral-900 transition-colors group-hover:text-neutral-500">
                 {product.name}
               </p>
+              {product.subtitle && <p className="mt-0.5 text-xs text-neutral-500">{product.subtitle}</p>}
             </Link>
           </li>
         ))}

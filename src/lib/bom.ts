@@ -7,6 +7,16 @@ export type MaterialItem = {
   code?: string;
   /** component — комплектующие, fastener — крепёж, consumable — расходники, cut — нарезка на отрезки, packaging — упаковка и документы */
   category: MaterialCategory;
+  /** Процесс сборки ("Пакування"…). Позиции с процессом выводятся в блоке процесса, а не в разделе категории */
+  process?: string;
+  /** Название позиции, внутрь которой кладётся эта (антенны → "Пакетик для антен") */
+  inside?: string;
+  /** Изделие собственного производства — ссылка на его страницу в каталоге */
+  productSlug?: string;
+  /** Короткое примечание рядом с названием */
+  note?: string;
+  /** Своё производство (3D-деталь, своё изделие) — не закупается */
+  madeInHouse?: boolean;
   /** Штук (или отрезков) на одно изделие */
   count: number;
   /** Длина отрезка, см; нет — считается поштучно */
@@ -17,10 +27,7 @@ export type MaterialItemOrder = MaterialItem & { pieces: number; totalCm: number
 
 export type Segment = { count: number; lengthCm: number };
 
-export type MaterialTotal = {
-  name: string;
-  code?: string;
-  category: MaterialCategory;
+export type MaterialTotal = Omit<MaterialItem, "count" | "lengthCm"> & {
   /** На одно изделие */
   count: number;
   cm: number | null;
@@ -31,18 +38,38 @@ export type MaterialTotal = {
   totalCm: number | null;
 };
 
+/** Процесс позиции; упаковка без явного процесса относится к «Пакування» */
+export function processOf(m: Pick<MaterialItem, "process" | "category">): string | undefined {
+  return m.process ?? (m.category === "packaging" ? "Пакування" : undefined);
+}
+
 export function calcMaterials(items: MaterialItem[], devices: number) {
   const rows: MaterialItemOrder[] = items.map((m) => ({
     ...m,
+    process: processOf(m),
     pieces: m.count * devices,
     totalCm: m.lengthCm === undefined ? null : m.lengthCm * m.count * devices,
   }));
 
-  // Одинаковые позиции (по коду, иначе по названию) из разных строк списка складываем
+  // Одинаковые позиции (по коду, иначе по названию) из разных строк списка складываем — в пределах процесса
   const totals = new Map<string, MaterialTotal>();
   for (const r of rows) {
-    const key = r.code ?? r.name;
-    const t = totals.get(key) ?? { name: r.name, code: r.code, category: r.category, count: 0, cm: null, segments: [], pieces: 0, totalCm: null };
+    const key = `${r.process ?? ""}|${r.code ?? r.name}`;
+    const t = totals.get(key) ?? {
+      name: r.name,
+      code: r.code,
+      category: r.category,
+      process: r.process,
+      inside: r.inside,
+      productSlug: r.productSlug,
+      note: r.note,
+      madeInHouse: r.madeInHouse,
+      count: 0,
+      cm: null,
+      segments: [],
+      pieces: 0,
+      totalCm: null,
+    };
     t.count += r.count;
     t.pieces += r.pieces;
     if (r.lengthCm !== undefined) {
@@ -54,4 +81,9 @@ export function calcMaterials(items: MaterialItem[], devices: number) {
   }
 
   return { rows, totals: [...totals.values()] };
+}
+
+/** Процессы в порядке первого появления в списке */
+export function listProcesses(items: MaterialItem[]): string[] {
+  return [...new Set(items.flatMap((m) => processOf(m) ?? []))];
 }

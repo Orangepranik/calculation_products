@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { pluralDevices } from "./ProductCalculator";
-import type { SectionId } from "@/lib/positions";
-import { calcMaterials, type MaterialCategory, type MaterialItem, type MaterialTotal } from "@/lib/bom";
+import { processSectionId, type SectionId } from "@/lib/positions";
+import { calcMaterials, listProcesses, type MaterialCategory, type MaterialItem, type MaterialTotal } from "@/lib/bom";
 import { formatCount, formatLength, formatSegments } from "@/lib/format";
 
 const forDevicesLabel = (devices: number) => `На ${formatCount(devices)} ${pluralDevices(devices)}`;
 
-/** Комплектующие, крепёж, расходники (одинаковые позиции сложены), нарезка на отрезки */
+/** Комплектующие, крепёж, расходники (одинаковые позиции сложены), нарезка на отрезки — только позиции без процесса */
 export function MaterialsSections({ items, devices }: { items: MaterialItem[]; devices: number }) {
   const { totals } = calcMaterials(items, devices);
-  const by = (c: MaterialCategory) => totals.filter((t) => t.category === c);
+  const by = (c: MaterialCategory) => totals.filter((t) => t.category === c && !t.process);
   const components = by("component");
   const fasteners = by("fastener");
   const consumables = by("consumable");
@@ -42,15 +43,18 @@ export function MaterialsSections({ items, devices }: { items: MaterialItem[]; d
   );
 }
 
-/** Упаковка и документы — выводится в конце страницы */
-export function PackagingSection({ items, devices }: { items: MaterialItem[]; devices: number }) {
-  const packaging = calcMaterials(items, devices).totals.filter((t) => t.category === "packaging");
-  if (packaging.length === 0) return null;
-  return (
-    <Section id="packaging" title="Пакування">
-      <MaterialsTable rows={packaging} devices={devices} forDevices={forDevicesLabel(devices)} />
+/** Процессы сборки (Пакування…) — каждый своим блоком в конце страницы */
+export function ProcessSections({ items, devices }: { items: MaterialItem[]; devices: number }) {
+  const { totals } = calcMaterials(items, devices);
+  return listProcesses(items).map((process, i) => (
+    <Section key={process} id={processSectionId(i)} title={process}>
+      <MaterialsTable
+        rows={totals.filter((t) => t.process === process)}
+        devices={devices}
+        forDevices={forDevicesLabel(devices)}
+      />
     </Section>
-  );
+  ));
 }
 
 function Section({ id, title, first, children }: { id: SectionId; title: string; first?: boolean; children: ReactNode }) {
@@ -85,9 +89,9 @@ function MaterialsTable({
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.code ?? r.name} className="border-b border-neutral-100">
-              <td className="py-3 pr-3">
-                <Name name={r.name} code={r.code} />
+            <tr key={r.code ?? r.name} className={r.inside ? "border-b border-neutral-100 text-neutral-700" : "border-b border-neutral-100"}>
+              <td className={r.inside ? "py-3 pr-3 pl-5" : "py-3 pr-3"}>
+                <Name total={r} />
               </td>
               <td className="py-3 pr-3 text-right">
                 <Amount total={r} multiplier={1} />
@@ -134,11 +138,20 @@ export function Length({ cm, detail }: { cm: number; detail: string }) {
   );
 }
 
-function Name({ name, code }: { name: string; code?: string }) {
+function Name({ total }: { total: MaterialTotal }) {
+  const { name, code, note, productSlug, inside } = total;
   return (
     <>
-      {name}
+      {inside && <span className="mr-1.5 text-neutral-300" aria-label={`у ${inside}`}>↳</span>}
+      {productSlug ? (
+        <Link href={`/products/${productSlug}`} className="underline decoration-neutral-300 underline-offset-4 hover:decoration-neutral-900">
+          {name}
+        </Link>
+      ) : (
+        name
+      )}
       {code && <span className="ml-2 text-xs text-neutral-400">{code}</span>}
+      {note && <span className="ml-2 text-xs text-neutral-400">{note}</span>}
     </>
   );
 }

@@ -27,7 +27,10 @@ export default async function ProductPage(props: PageProps<"/products/[slug]">) 
         <div className="w-20 shrink-0 sm:w-24">
           <ProductImage product={product} sizes="96px" compact />
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight">{product.name}</h1>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">{product.name}</h1>
+          {product.subtitle && <p className="mt-1 text-sm text-neutral-500">{product.subtitle}</p>}
+        </div>
       </div>
       {product.parts || product.wires || product.materials ? (
         <ProductCalculator

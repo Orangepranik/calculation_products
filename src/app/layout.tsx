@@ -23,10 +23,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="uk" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <header className="border-b border-neutral-100">
-          <div className="mx-auto flex h-14 max-w-5xl items-center px-4 sm:px-6">
+          <div className="mx-auto flex h-14 max-w-5xl items-center gap-6 px-4 sm:px-6">
             <Link href="/" className="text-sm font-medium tracking-tight">
               Калькуляція
             </Link>
+            <nav className="ml-auto flex gap-5 text-sm text-neutral-500">
+              <Link href="/" className="transition-colors hover:text-neutral-900">
+                Продукція
+              </Link>
+              <Link href="/plan" className="transition-colors hover:text-neutral-900">
+                План
+              </Link>
+            </nav>
           </div>
         </header>
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">{children}</main>

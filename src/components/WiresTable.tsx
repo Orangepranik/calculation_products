@@ -104,7 +104,7 @@ export function WiresTable({ cuts, devices }: { cuts: WireCut[]; devices: number
   );
 }
 
-function Color({ color, alternatives = [] }: { color: WireColor; alternatives?: WireColor[] }) {
+export function Color({ color, alternatives = [] }: { color: WireColor; alternatives?: WireColor[] }) {
   return (
     <span className="inline-flex items-center gap-2">
       <span className={`size-2.5 shrink-0 rounded-full outline outline-1 -outline-offset-1 outline-black/15 ${swatch[color]}`} />

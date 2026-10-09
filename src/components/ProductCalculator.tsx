@@ -6,7 +6,7 @@ import type { Part } from "@/lib/calc";
 import type { WireCut } from "@/lib/wires";
 import { PartsTable } from "./PartsTable";
 import { WiresTable } from "./WiresTable";
-import { MaterialsSections, PackagingSection } from "./MaterialsSections";
+import { MaterialsSections, ProcessSections } from "./MaterialsSections";
 import type { MaterialItem } from "@/lib/bom";
 import { countPositions } from "@/lib/positions";
 
@@ -62,7 +62,7 @@ export function ProductCalculator({ parts, wires, materials }: Props) {
           <WiresTable cuts={wires} devices={devices} />
         </section>
       )}
-      {materials && <PackagingSection items={materials} devices={devices} />}
+      {materials && <ProcessSections items={materials} devices={devices} />}
     </>
   );
 }
